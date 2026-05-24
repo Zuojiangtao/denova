@@ -20,15 +20,12 @@ import type { FileNode } from '@/hooks/useWorkspace'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import {
   Bot,
-  CheckCircle2,
   GitBranch,
   FolderTree,
   Home,
-  ListTodo,
   RefreshCw,
   Settings,
   X,
-  Zap,
 } from 'lucide-react'
 
 const PROJECT_VISIBLE_KEY = 'nova.layout.projectVisible'
@@ -158,17 +155,14 @@ function App() {
     return enforceTabLimit(tabs, protectedKey, maxOpenTabs, tabActivationsRef.current)
   }, [maxOpenTabs])
   const rightPanel = useWorkspaceStore((state) => state.rightPanel)
-  const bottomPanel = useWorkspaceStore((state) => state.bottomPanel)
   const commandOpen = useWorkspaceStore((state) => state.commandOpen)
   const mode = useWorkspaceStore((state) => state.mode)
   const setRightPanel = useWorkspaceStore((state) => state.setRightPanel)
-  const setBottomPanel = useWorkspaceStore((state) => state.setBottomPanel)
   const setCommandOpen = useWorkspaceStore((state) => state.setCommandOpen)
   const setMode = useWorkspaceStore((state) => state.setMode)
   const setSelectedChapterId = useWorkspaceStore((state) => state.setSelectedChapterId)
   const aiVisible = rightPanel === 'ai'
   const versionsVisible = rightPanel === 'versions'
-  const taskVisible = bottomPanel === 'tasks'
   const {
     tree, loading, selectedFile, fileContent, workspace, styles, books,
     selectFile, clearSelectedFile, saveCurrentFile, createItem, deleteItem, renameItem, copyItem, moveItem,
@@ -454,6 +448,22 @@ function App() {
       <header className="flex h-7 shrink-0 items-center border-b border-[#303238] bg-[#202124] px-2 text-xs text-[#9aa0aa]">
         <div className="font-medium text-[#d7dbe2]">Nova</div>
         <div className="ml-2 truncate text-[#7f8590]">小说 IDE</div>
+        <div className="ml-3 flex items-center gap-1">
+          <button
+            type="button"
+            className={`rounded-md px-3 py-0.5 text-xs ${mode === 'ide' ? 'bg-[#2f7dd3] text-white' : 'text-[#9aa0aa] hover:bg-[#303238]'}`}
+            onClick={() => setMode('ide')}
+          >
+            IDE
+          </button>
+          <button
+            type="button"
+            className={`rounded-md px-3 py-0.5 text-xs ${mode === 'interactive' ? 'bg-[#2f7dd3] text-white' : 'text-[#9aa0aa] hover:bg-[#303238]'}`}
+            onClick={() => setMode('interactive')}
+          >
+            Interactive
+          </button>
+        </div>
       </header>
 
       <WorkspaceSelector
@@ -462,22 +472,6 @@ function App() {
         onSwitch={handleWorkspaceSwitch}
         onBooksChange={refreshBooks}
       />
-      <div className="flex h-9 items-center gap-1 border-b border-[#303238] bg-[#202124] px-2">
-        <button
-          type="button"
-          className={`rounded-md px-3 py-1 text-xs ${mode === 'ide' ? 'bg-[#2f7dd3] text-white' : 'text-[#9aa0aa] hover:bg-[#303238]'}`}
-          onClick={() => setMode('ide')}
-        >
-          IDE
-        </button>
-        <button
-          type="button"
-          className={`rounded-md px-3 py-1 text-xs ${mode === 'interactive' ? 'bg-[#2f7dd3] text-white' : 'text-[#9aa0aa] hover:bg-[#303238]'}`}
-          onClick={() => setMode('interactive')}
-        >
-          Interactive
-        </button>
-      </div>
     </>
   )
 
@@ -503,13 +497,6 @@ function App() {
         className={`mb-4 hover:bg-[#303238] ${aiVisible ? 'text-[#d7dbe2]' : 'text-[#6f7580]'}`}
       >
         <Bot className="h-4 w-4" />
-      </TooltipIconButton>
-      <TooltipIconButton
-        label="显示/隐藏任务面板"
-        onClick={() => setBottomPanel(taskVisible ? null : 'tasks')}
-        className={`mb-4 hover:bg-[#303238] ${taskVisible ? 'text-[#d7dbe2]' : 'text-[#6f7580]'}`}
-      >
-        <ListTodo className="h-4 w-4" />
       </TooltipIconButton>
       <TooltipIconButton
         label="版本管理"
@@ -708,36 +695,6 @@ function App() {
     />
   ) : null
 
-  const bottomPanelContent = taskVisible ? (
-    <footer className="flex h-full flex-col border-t border-[#303238] bg-[#202124]">
-      <div className="flex h-8 items-center border-b border-[#303238] px-3 text-xs">
-        <ListTodo className="mr-2 h-3.5 w-3.5 text-[#7aa2f7]" />
-        <span className="text-[#c5c9d1]">任务</span>
-        <span className="ml-2 rounded bg-[#0e639c] px-1.5 py-0.5 text-[10px] text-white">1</span>
-        <button
-          type="button"
-          onClick={() => setBottomPanel(null)}
-          className="ml-auto rounded px-1 text-[#858b96] hover:bg-[#303238] hover:text-[#d7dbe2]"
-        >
-          ×
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto px-4 py-2 font-mono text-[11px] leading-5 text-[#858b96]">
-        <div className="flex items-center gap-2 text-[#7aa2f7]">
-          <Zap className="h-3 w-3" />
-          <span>写作流</span>
-          <span className="ml-auto">0/1 ×</span>
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <CheckCircle2 className="h-3 w-3 text-[#6cc477]" />
-          <span>WebUI 已就绪：目录树 / TipTap 编辑器 / 创作Agent</span>
-        </div>
-        <div className="ml-5">当前文件：{selectedFile || '未选择'}</div>
-        <div className="ml-5">Workspace：{workspace || '未设置'}</div>
-      </div>
-    </footer>
-  ) : null
-
   const statusBar = (
     <div className="flex h-6 shrink-0 items-center border-t border-[#303238] bg-[#1f2023] px-3 text-[11px] text-[#858b96]">
       <span>Nova v{APP_VERSION}</span>
@@ -756,23 +713,18 @@ function App() {
         main={main}
         rightPanel={mode === 'ide' ? rightPanelContent : null}
         rightPanelVisible={mode === 'ide' && Boolean(rightPanelContent)}
-        bottomPanel={bottomPanelContent}
-        bottomPanelVisible={Boolean(bottomPanelContent)}
         statusBar={statusBar}
       />
       <CommandPalette
         open={commandOpen}
         isStreaming={isStreaming}
-        taskPanelOpen={taskVisible}
         onOpenChange={setCommandOpen}
         onSave={triggerSave}
         onOpenAgent={() => setRightPanel('ai')}
         onOpenVersions={() => setRightPanel('versions')}
-        onToggleTasks={() => setBottomPanel(taskVisible ? null : 'tasks')}
         onContinueWriting={continueWriting}
         onClosePanels={() => {
           setRightPanel(null)
-          setBottomPanel(null)
         }}
       />
     </>

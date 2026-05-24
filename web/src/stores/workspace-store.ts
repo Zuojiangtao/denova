@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export type RightPanel = 'ai' | 'outline' | 'characters' | 'versions' | null
-export type BottomPanel = 'tasks' | 'versions' | 'problems' | null
+export type BottomPanel = 'versions' | 'problems' | null
 export type WorkspaceMode = 'ide' | 'interactive'
 
 const MODE_STORAGE_KEY = 'nova:mode'
@@ -32,7 +32,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
   selectedProjectId: undefined,
   selectedChapterId: undefined,
   rightPanel: 'ai',
-  bottomPanel: 'tasks',
+  bottomPanel: null,
   commandOpen: false,
   setMode: (mode) => {
     if (typeof window !== 'undefined') window.localStorage.setItem(MODE_STORAGE_KEY, mode)
